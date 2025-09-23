@@ -39,8 +39,8 @@ Une API REST moderne et complète pour calculer les tarifs de taxi en Vendée se
 
 ```bash
 # Cloner le projet
-git clone <votre-repo>
-cd taxi_fastapi
+git clone https://github.com/Glad91/taxi-fastapi-vendee.git
+cd taxi-fastapi-vendee
 
 # Installer les dépendances
 pip install -r requirements.txt
@@ -181,11 +181,14 @@ curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
 ## 🏗️ Architecture
 
 ```
-taxi_fastapi/
+taxi-fastapi-vendee/
 ├── main.py              # Application principale FastAPI
 ├── requirements.txt     # Dépendances Python
+├── setup.py             # Configuration du package Python
+├── pyproject.toml       # Configuration moderne du projet
 ├── test_main.http      # Tests HTTP manuels
 ├── CLAUDE.md           # Instructions pour Claude Code
+├── LICENSE             # Licence MIT
 └── README.md           # Cette documentation
 ```
 
@@ -307,6 +310,8 @@ Développé avec ❤️ pour la gestion des tarifs de taxi en Vendée.
 
 ## 🔗 Liens utiles
 
+- [Repository GitHub](https://github.com/Glad91/taxi-fastapi-vendee)
+- [Documentation de l'API](https://github.com/Glad91/taxi-fastapi-vendee#endpoints-disponibles)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [Pydantic Documentation](https://pydantic-docs.helpmanual.io/)
 - [Uvicorn Documentation](https://www.uvicorn.org/)
