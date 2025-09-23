@@ -3,12 +3,9 @@
 # Utiliser avec IntelliJ IDEA, VS Code REST Client ou similaire
 
 ### Variables d'environnement PRODUCTION
-@baseUrl = https://taxi-api-vendee.onrender.com
+@baseUrl = https://tarif-taxi-vendee.onrender.com
 @timeout = 30000  # 30 secondes pour le premier réveil
 
-### ===============================================
-### 🔄 TESTS DE DISPONIBILITÉ ET RÉVEIL
-### ===============================================
 
 ### 1. Test de réveil (peut prendre 30s si l'app est endormie)
 GET {{baseUrl}}/verifier-sante

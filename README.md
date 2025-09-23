@@ -253,13 +253,13 @@ services:
 4. **Déployer** :
    - Cliquer "Create Web Service"
    - Le déploiement prend 2-3 minutes
-   - URL finale : `https://taxi-api-vendee.onrender.com`
+   - URL finale : `https://tarif-taxi-vendee.onrender.com`
 
 #### 3. Test en production
 
 Une fois déployé, tester avec :
 ```bash
-curl https://taxi-api-vendee.onrender.com/verifier-sante
+curl https://tarif-taxi-vendee.onrender.com/verifier-sante
 ```
 
 #### 4. Limitations du plan gratuit
