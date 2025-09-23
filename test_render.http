@@ -1,0 +1,231 @@
+# Tests pour l'API Taxi Vendée 2025 - PRODUCTION RENDER
+# URL de production sur Render.com
+# Utiliser avec IntelliJ IDEA, VS Code REST Client ou similaire
+
+### Variables d'environnement PRODUCTION
+@baseUrl = https://taxi-api-vendee.onrender.com
+@timeout = 30000  # 30 secondes pour le premier réveil
+
+### ===============================================
+### 🔄 TESTS DE DISPONIBILITÉ ET RÉVEIL
+### ===============================================
+
+### 1. Test de réveil (peut prendre 30s si l'app est endormie)
+GET {{baseUrl}}/verifier-sante
+Accept: application/json
+
+###
+
+### 2. Deuxième test de santé (doit être rapide maintenant)
+GET {{baseUrl}}/verifier-sante
+Accept: application/json
+
+###
+
+### ===============================================
+### 📊 TESTS FONCTIONNELS COMPLETS
+### ===============================================
+
+### 3. Récupération des tarifs officiels
+GET {{baseUrl}}/tarifs
+Accept: application/json
+
+###
+
+### 4. Estimation rapide - Course courte jour aller-retour
+GET {{baseUrl}}/estimation-rapide?distance_km=5&aller_retour=true
+Accept: application/json
+
+###
+
+### 5. Estimation rapide - Course longue nuit aller simple
+GET {{baseUrl}}/estimation-rapide?distance_km=25&aller_retour=false&minutes_attente=3
+Accept: application/json
+
+###
+
+### 6. Calcul détaillé - Course standard jour
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 12.5,
+  "minutes_attente": 5.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-24T14:30:00"
+}
+
+###
+
+### 7. Calcul détaillé - Course nuit weekend (tarif élevé)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 18.0,
+  "minutes_attente": 2.0,
+  "aller_retour": false,
+  "date_heure_depart": "2025-09-28T23:15:00"
+}
+
+###
+
+### 8. Test tarif minimum (course très courte)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 1.5,
+  "minutes_attente": 1.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-24T10:00:00"
+}
+
+###
+
+### 9. Course dimanche après-midi (tarif majoré)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 15.0,
+  "minutes_attente": 4.0,
+  "aller_retour": false,
+  "date_heure_depart": "2025-09-28T16:30:00"
+}
+
+###
+
+### ===============================================
+### 🧪 TESTS DE VALIDATION ET ERREURS
+### ===============================================
+
+### 10. Test validation - Distance négative (erreur 400 attendue)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": -5.0,
+  "minutes_attente": 0,
+  "aller_retour": false
+}
+
+###
+
+### 11. Test validation - Minutes d'attente négatives (erreur attendue)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 10.0,
+  "minutes_attente": -2.0,
+  "aller_retour": true
+}
+
+###
+
+### 12. Test endpoint inexistant (erreur 404 attendue)
+GET {{baseUrl}}/endpoint-inexistant
+Accept: application/json
+
+###
+
+### ===============================================
+### ⚡ TESTS DE PERFORMANCE
+### ===============================================
+
+### 13. Test rapide estimation (mesurer le temps de réponse)
+GET {{baseUrl}}/estimation-rapide?distance_km=10&aller_retour=true
+Accept: application/json
+
+###
+
+### 14. Test calcul complexe (mesurer le temps de réponse)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 50.0,
+  "minutes_attente": 10.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-28T02:30:00"
+}
+
+###
+
+### ===============================================
+### 🌐 TESTS CORS ET HEADERS
+### ===============================================
+
+### 15. Test CORS avec Origin
+GET {{baseUrl}}/verifier-sante
+Accept: application/json
+Origin: https://mon-site-client.com
+
+###
+
+### 16. Test avec User-Agent personnalisé
+GET {{baseUrl}}/tarifs
+Accept: application/json
+User-Agent: TaxiApp/1.0 (Test Client)
+
+###
+
+### ===============================================
+### 📱 SIMULATION D'USAGE RÉEL
+### ===============================================
+
+### 17. Scénario réel 1: Client demande estimation puis calcul détaillé
+GET {{baseUrl}}/estimation-rapide?distance_km=8.5&aller_retour=false
+
+###
+
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 8.5,
+  "minutes_attente": 2.0,
+  "aller_retour": false,
+  "date_heure_depart": "2025-09-24T19:45:00"
+}
+
+###
+
+### 18. Scénario réel 2: Consultation des tarifs puis calcul weekend
+GET {{baseUrl}}/tarifs
+
+###
+
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 22.0,
+  "minutes_attente": 7.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-29T14:00:00"
+}
+
+###
+
+### ===============================================
+### 📊 NOTES ET MÉTRIQUES À SURVEILLER
+### ===============================================
+
+# 🔍 Points à vérifier :
+# - Temps de réveil < 30s pour le premier appel
+# - Temps de réponse < 2s pour les appels suivants
+# - Codes de statut corrects (200, 400, 404)
+# - Formats JSON valides
+# - Calculs mathématiques corrects
+# - Gestion des erreurs appropriée
+# - Headers CORS si nécessaire
+
+# 📈 Métriques de performance attendues :
+# - /verifier-sante : < 500ms
+# - /tarifs : < 500ms
+# - /estimation-rapide : < 1s
+# - /calculer-tarif : < 1.5s
+
+###
