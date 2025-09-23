@@ -213,13 +213,62 @@ pytest tests/
 
 ## 🚀 Déploiement
 
-### Développement
+### Développement local
 
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Production
+### 🌐 Déploiement gratuit sur Render
+
+#### 1. Configuration automatique
+Le projet inclut un fichier `render.yaml` pour un déploiement en 1 clic :
+
+```yaml
+services:
+  - type: web
+    name: taxi-api-vendee
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /verifier-sante
+```
+
+#### 2. Déploiement étape par étape
+
+1. **Créer un compte** sur [Render.com](https://render.com)
+
+2. **Connecter le repository** :
+   - Aller sur le dashboard Render
+   - Cliquer "New +" → "Web Service"
+   - Connecter votre compte GitHub
+   - Sélectionner le repo `taxi-fastapi-vendee`
+
+3. **Configuration automatique** :
+   - Render détecte automatiquement le `render.yaml`
+   - Nom : `taxi-api-vendee`
+   - Build Command : `pip install -r requirements.txt`
+   - Start Command : `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+4. **Déployer** :
+   - Cliquer "Create Web Service"
+   - Le déploiement prend 2-3 minutes
+   - URL finale : `https://taxi-api-vendee.onrender.com`
+
+#### 3. Test en production
+
+Une fois déployé, tester avec :
+```bash
+curl https://taxi-api-vendee.onrender.com/verifier-sante
+```
+
+#### 4. Limitations du plan gratuit
+
+- ⏰ **Hibernation** : L'app s'endort après 15min d'inactivité
+- 🔄 **Réveil** : Premier accès prend ~30 secondes
+- ⚡ **750h/mois** incluses (suffisant pour la plupart des usages)
+
+### Production alternative
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4

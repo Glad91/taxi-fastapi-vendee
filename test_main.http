@@ -1,11 +1,94 @@
-# Test your FastAPI endpoints
+# Tests pour l'API Taxi Vendée 2025
+# Utiliser avec IntelliJ IDEA, VS Code REST Client ou similaire
 
-GET http://127.0.0.1:8000/
+### Variables d'environnement
+@baseUrl = http://127.0.0.1:8000
+# @baseUrl = https://votre-app.onrender.com  # Pour tester en production
+
+### 1. Vérification de l'état de l'API
+GET {{baseUrl}}/verifier-sante
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
+### 2. Récupération des tarifs officiels
+GET {{baseUrl}}/tarifs
 Accept: application/json
+
+###
+
+### 3. Estimation rapide - Course jour aller-retour
+GET {{baseUrl}}/estimation-rapide?distance_km=10&aller_retour=true
+Accept: application/json
+
+###
+
+### 4. Estimation rapide - Course nuit aller simple
+GET {{baseUrl}}/estimation-rapide?distance_km=15.5&aller_retour=false&minutes_attente=2
+Accept: application/json
+
+###
+
+### 5. Calcul détaillé - Course jour avec attente
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 12.5,
+  "minutes_attente": 5.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-24T14:30:00"
+}
+
+###
+
+### 6. Calcul détaillé - Course nuit weekend
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 8.0,
+  "minutes_attente": 0,
+  "aller_retour": false,
+  "date_heure_depart": "2025-09-28T22:15:00"
+}
+
+###
+
+### 7. Test avec tarif minimum
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 2.0,
+  "minutes_attente": 1.0,
+  "aller_retour": true,
+  "date_heure_depart": "2025-09-24T10:00:00"
+}
+
+###
+
+### 8. Test dimanche (tarif élevé)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": 20.0,
+  "minutes_attente": 3.0,
+  "aller_retour": false,
+  "date_heure_depart": "2025-09-28T15:00:00"
+}
+
+###
+
+### 9. Test validation - Distance négative (erreur attendue)
+POST {{baseUrl}}/calculer-tarif
+Content-Type: application/json
+
+{
+  "distance_km": -5.0,
+  "minutes_attente": 0,
+  "aller_retour": false
+}
 
 ###
