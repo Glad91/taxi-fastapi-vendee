@@ -203,15 +203,24 @@ class CalculateurTarifsCPAM:
 
         supplements += peages
 
-        total += supplements
-
+        # Pour transport partagé : multiplier le tarif total par le nombre de patients
         abattement_taux = 0.0
         abattement_montant = 0.0
+
         if nb_patients > 1:
+            # Multiplier le tarif (base + majoration) par le nombre de patients
+            total_avant_supplements = total * nb_patients
+            # Ajouter les suppléments
+            total = total_avant_supplements + supplements
+
+            # Appliquer l'abattement sur le total (hors suppléments TPMR et péages)
             base_abattement = total - supplements + (self.supplement_tpmr if tpmr else 0)
             abattement_taux = self.abattements_partage.get(min(nb_patients, 4), self.abattements_partage[4])
             abattement_montant = base_abattement * abattement_taux
             total -= abattement_montant
+        else:
+            # Patient unique : logique normale
+            total += supplements
 
         return {
             "total": round(total, 2),
