@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Body, Query
 from pydantic import BaseModel, Field
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone, timedelta
 from typing import Optional
 
 # --- Classe de Calculateur de Tarifs ---
@@ -22,6 +22,8 @@ class CalculateurTarifsTaxi:
         self.debut_nuit = time(19, 0)  # 19h00
         self.fin_nuit = time(7, 0)  # 7h00
         self.tarif_minimum = 8.0  # Tarif minimum
+        # Fuseau horaire français (UTC+1 hiver, UTC+2 été)
+        self.fuseau_france = timezone(timedelta(hours=1))  # Approximation simple
 
     def est_tarif_nuit(self, date_heure_depart: time) -> bool:
         """Determine si c'est un tarif de nuit (19h-7h) ou dimanche/ferie"""
@@ -31,10 +33,17 @@ class CalculateurTarifsTaxi:
         """Verifie si c'est dimanche"""
         return date_depart.weekday() == 6  # 6 = dimanche
 
+    def obtenir_heure_france(self) -> datetime:
+        """Retourne l'heure actuelle en France (approximation UTC+1)"""
+        return datetime.now(self.fuseau_france)
+
     def calculer_tarif_course(self, distance_km: float, minutes_attente: float = 0, date_heure_depart: Optional[datetime] = None, aller_retour: bool = False):
         """Calcule le tarif total de la course"""
         if date_heure_depart is None:
-            date_heure_depart = datetime.now()
+            date_heure_depart = self.obtenir_heure_france()
+        # Si une heure est fournie sans timezone, on assume qu'elle est en heure française
+        elif date_heure_depart.tzinfo is None:
+            date_heure_depart = date_heure_depart.replace(tzinfo=self.fuseau_france)
 
         total = self.prix_base
         est_nuit_ou_dimanche = self.est_dimanche(date_heure_depart.date()) or self.est_tarif_nuit(date_heure_depart.time())
