@@ -1,6 +1,6 @@
-# 🚕 API Taxi Vendée 2025
+# 🚕 API Taxi Vendée 2025 + CPAM
 
-Une API REST moderne et complète pour calculer les tarifs de taxi en Vendée selon la réglementation officielle de 2025.
+Une API REST moderne et complète pour calculer les tarifs de taxi en Vendée selon la réglementation officielle de 2025 ET les tarifs de transport sanitaire selon la convention-cadre nationale CPAM 2025.
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.117.1-green.svg)
@@ -10,15 +10,28 @@ Une API REST moderne et complète pour calculer les tarifs de taxi en Vendée se
 
 ## 📋 Fonctionnalités
 
+### 🚕 Tarifs Taxi Vendée 2025
 - ✅ **Calcul de tarifs précis** basé sur les tarifs officiels Vendée 2025
 - ✅ **Gestion des tarifs jour/nuit** (19h00-07h00)
 - ✅ **Distinction aller simple / aller-retour**
 - ✅ **Gestion des dimanches et jours fériés**
 - ✅ **Calcul du temps d'attente**
 - ✅ **Application du tarif minimum**
+
+### 🏥 Tarifs CPAM Transport Sanitaire 2025
+- ✅ **Calculs selon convention-cadre nationale CPAM 2025**
+- ✅ **Forfaits de prise en charge** (€13.00 incluant 4 premiers km)
+- ✅ **Suppléments grandes villes** (Paris, Lyon, Marseille, etc.)
+- ✅ **Majorations nuit/weekend** (50%) et hospitalisation (25-50%)
+- ✅ **Suppléments TPMR** (€30.00) et DROM (€3.00)
+- ✅ **Abattements transport partagé** (23-37% selon nombre de patients)
+- ✅ **Gestion des péages** et frais annexes
+
+### 🛠️ Fonctionnalités techniques
 - ✅ **Documentation API automatique** avec Swagger UI
 - ✅ **Validation des données** avec Pydantic
 - ✅ **API RESTful** avec FastAPI
+- ✅ **Gestion des fuseaux horaires** (Europe/Paris)
 
 ## 🛠️ Stack Technique
 
@@ -72,9 +85,10 @@ Une fois l'application lancée, accédez à :
 | Endpoint | Méthode | Description |
 |----------|---------|-------------|
 | `/verifier-sante` | GET | Vérification de l'état de l'API |
-| `/calculer-tarif` | POST | Calcul détaillé du tarif d'une course |
-| `/tarifs` | GET | Récupération des tarifs officiels actuels |
-| `/estimation-rapide` | GET | Estimation rapide via paramètres URL |
+| `/calculer-tarif` | POST | **Taxi** - Calcul détaillé du tarif Vendée 2025 |
+| `/calculer-tarif-cpam` | POST | **CPAM** - Calcul selon convention transport sanitaire 2025 |
+| `/tarifs` | GET | Récupération des tarifs officiels taxi actuels |
+| `/estimation-rapide` | GET | Estimation rapide taxi via paramètres URL |
 
 ## 💡 Utilisation
 
@@ -129,7 +143,7 @@ curl -X GET "http://127.0.0.1:8000/estimation-rapide?distance_km=10&aller_retour
 }
 ```
 
-### 4. Calcul détaillé
+### 4. Calcul détaillé Taxi
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
@@ -161,6 +175,52 @@ curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
 }
 ```
 
+### 5. Calcul CPAM Transport Sanitaire
+
+```bash
+curl -X POST "http://127.0.0.1:8000/calculer-tarif-cpam" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "distance_km": 25,
+       "ville_depart": "La Roche-sur-Yon",
+       "ville_arrivee": "Nantes",
+       "date_heure_transport": "2025-01-15T21:30:00",
+       "type_transport": "hospitalisation",
+       "nb_patients": 2,
+       "tpmr": true,
+       "peages": 8.5,
+       "departement": "85"
+     }'
+```
+
+**Réponse :**
+```json
+{
+  "total": 87.25,
+  "details": {
+    "forfait_prise_charge": 13.0,
+    "distance_km": 25.0,
+    "nb_patients": 2,
+    "forfait_grande_ville": 15.0,
+    "km_facturables": 21.0,
+    "tarif_km": 1.07,
+    "cout_kilometrique": 22.47,
+    "base_tarifaire": 50.47,
+    "majoration_taux": 0.5,
+    "majoration_type": "nuit/weekend",
+    "majoration_montant": 25.24,
+    "supplement_tpmr": 30.0,
+    "supplement_drom": 0.0,
+    "peages": 8.5,
+    "total_supplements": 38.5,
+    "abattement_partage_taux": 0.23,
+    "abattement_partage_montant": 26.07,
+    "departement": "85",
+    "date_heure_transport": "2025-01-15T21:30:00+01:00"
+  }
+}
+```
+
 ## 📊 Système de Tarification
 
 ### Tarifs officiels Vendée 2025
@@ -189,6 +249,54 @@ curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
   - Distance facturable : 90km
   - Coût : 90km × tarif aller-retour + prix de base
 
+## 🏥 Système de Tarification CPAM 2025
+
+### Tarifs selon convention-cadre nationale
+
+| Élément | Tarif | Description |
+|---------|-------|-------------|
+| **Forfait prise en charge** | 13,00 € | Inclut les 4 premiers kilomètres |
+| **Forfait grande ville** | 15,00 € | Supplément pour grandes métropoles |
+| **Tarif kilométrique** | 1,07 €/km | À partir du 5ème kilomètre (Vendée) |
+
+### Majorations CPAM
+
+| Type | Taux | Conditions |
+|------|------|------------|
+| **Nuit/Weekend** | +50% | 20h00-08h00 et dimanches |
+| **Hospitalisation courte** | +25% | Transport < 50 km |
+| **Hospitalisation longue** | +50% | Transport ≥ 50 km |
+
+### Suppléments
+
+| Supplément | Montant | Description |
+|------------|---------|-------------|
+| **TPMR** | 30,00 € | Transport PMR avec véhicule adapté |
+| **DROM** | 3,00 € | Départements d'Outre-Mer |
+| **Péages** | Variable | Frais de péage réels |
+
+### Abattements transport partagé
+
+| Nombre de patients | Abattement | Description |
+|-------------------|------------|-------------|
+| **2 patients** | -23% | Réduction sur tarif de base |
+| **3 patients** | -35% | Réduction sur tarif de base |
+| **4+ patients** | -37% | Réduction maximale |
+
+### Villes éligibles au forfait grande ville (15€)
+
+- Paris, Marseille, Lyon, Toulouse, Nice, Nantes
+- Strasbourg, Montpellier, Bordeaux, Lille, Rennes, Grenoble
+- Départements 92, 93, 94 (Île-de-France)
+
+### Logique de calcul CPAM
+
+1. **Base** : 13€ forfait + éventuel forfait grande ville (15€)
+2. **Kilométrage** : (distance - 4 km) × 1,07€/km
+3. **Majorations** : Application de la plus élevée (nuit/weekend OU hospitalisation)
+4. **Suppléments** : TPMR + DROM + péages
+5. **Abattements** : Réduction selon nombre de patients (hors TPMR et péages)
+
 ## 🏗️ Architecture
 
 ```
@@ -198,6 +306,9 @@ taxi-fastapi-vendee/
 ├── setup.py             # Configuration du package Python
 ├── pyproject.toml       # Configuration moderne du projet
 ├── test_main.http      # Tests HTTP manuels
+├── conventions/         # Documents officiels CPAM
+│   ├── convention_2024.pdf
+│   └── convention_2025_nouvelle.pdf
 ├── CLAUDE.md           # Instructions pour Claude Code
 ├── LICENSE             # Licence MIT
 └── README.md           # Cette documentation
@@ -205,9 +316,12 @@ taxi-fastapi-vendee/
 
 ### Structure du code
 
-- **CalculateurTarifsTaxi** (`main.py:8-79`) : Logique métier de calcul des tarifs
-- **Modèles Pydantic** (`main.py:83-116`) : Validation et sérialisation des données
-- **Endpoints FastAPI** (`main.py:130-193`) : Points d'accès de l'API REST
+- **TypeTransport** (`main.py:10-12`) : Énumération pour types de transport CPAM
+- **CalculateurTarifsTaxi** (`main.py:14-97`) : Logique métier taxi Vendée 2025
+- **CalculateurTarifsCPAM** (`main.py:99-238`) : Logique métier transport sanitaire CPAM 2025
+- **Modèles Pydantic Taxi** (`main.py:242-274`) : Validation taxi (CourseRequete, CourseReponse)
+- **Modèles Pydantic CPAM** (`main.py:276-289`) : Validation CPAM (CourseCPAMRequete, CourseCPAMReponse)
+- **Endpoints FastAPI** (`main.py:307-391`) : Points d'accès de l'API REST (5 endpoints)
 
 ## 🧪 Tests
 
@@ -307,14 +421,14 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```python
 import requests
 
-# Estimation rapide
+# Estimation rapide taxi
 response = requests.get(
     "http://127.0.0.1:8000/estimation-rapide",
     params={"distance_km": 12.5, "aller_retour": True}
 )
 print(response.json())
 
-# Calcul détaillé
+# Calcul détaillé taxi
 data = {
     "distance_km": 20.0,
     "minutes_attente": 3.0,
@@ -326,19 +440,37 @@ response = requests.post(
     json=data
 )
 print(response.json())
+
+# Calcul CPAM transport sanitaire
+cpam_data = {
+    "distance_km": 45.0,
+    "ville_depart": "Vendée",
+    "ville_arrivee": "Paris",
+    "date_heure_transport": "2025-01-20T14:30:00",
+    "type_transport": "simple",
+    "nb_patients": 3,
+    "tpmr": False,
+    "peages": 12.5,
+    "departement": "85"
+}
+cpam_response = requests.post(
+    "http://127.0.0.1:8000/calculer-tarif-cpam",
+    json=cpam_data
+)
+print(cpam_response.json())
 ```
 
 ### JavaScript avec fetch
 
 ```javascript
-// Estimation rapide
+// Estimation rapide taxi
 const response = await fetch(
   'http://127.0.0.1:8000/estimation-rapide?distance_km=8&aller_retour=false'
 );
 const data = await response.json();
 console.log(data);
 
-// Calcul détaillé
+// Calcul détaillé taxi
 const calculation = await fetch('http://127.0.0.1:8000/calculer-tarif', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -350,6 +482,25 @@ const calculation = await fetch('http://127.0.0.1:8000/calculer-tarif', {
 });
 const result = await calculation.json();
 console.log(result);
+
+// Calcul CPAM transport sanitaire
+const cpamCalculation = await fetch('http://127.0.0.1:8000/calculer-tarif-cpam', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    distance_km: 30.0,
+    ville_depart: "La Roche-sur-Yon",
+    ville_arrivee: "Lyon",
+    date_heure_transport: "2025-02-15T09:00:00",
+    type_transport: "hospitalisation",
+    nb_patients: 1,
+    tpmr: true,
+    peages: 20.0,
+    departement: "85"
+  })
+});
+const cpamResult = await cpamCalculation.json();
+console.log(cpamResult);
 ```
 
 ## 🤝 Contribution
