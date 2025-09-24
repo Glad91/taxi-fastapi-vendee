@@ -148,14 +148,15 @@ curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
 {
   "prix_base": 2.94,
   "distance_km": 15.5,
-  "cout_distance": 25.11,
+  "distance_facturable": 31.0,
+  "cout_distance": 50.22,
   "minutes_attente": 0.0,
   "cout_attente": 0.0,
   "type_tarif": "nuit aller-retour (tarif B)",
   "aller_retour": true,
   "tarif_km": 1.62,
   "tarif_minimum_applique": false,
-  "total": 28.05,
+  "total": 53.16,
   "date_heure_depart": "2025-09-23T21:20:13.347028"
 }
 ```
@@ -177,6 +178,16 @@ curl -X POST "http://127.0.0.1:8000/calculer-tarif" \
 - **Temps d'attente** : 29,44 €/heure (0,49 €/minute)
 - **Tarif minimum** : 8,00 €
 - **Heures de nuit** : 19h00 - 07h00
+
+### Logique de calcul aller-retour
+
+- **Distance saisie** : Distance simple du trajet (ex: 45km)
+- **Distance facturable** :
+  - Aller simple : distance saisie (45km)
+  - Aller-retour : distance saisie × 2 (90km)
+- **Exemple** : Pour un aller-retour de 45km
+  - Distance facturable : 90km
+  - Coût : 90km × tarif aller-retour + prix de base
 
 ## 🏗️ Architecture
 

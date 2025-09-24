@@ -54,7 +54,9 @@ class CalculateurTarifsTaxi:
                 tarif_km = self.tarif_c_jour
                 type_tarif = "jour aller simple (tarif C)"
 
-        cout_distance = distance_km * tarif_km
+        # Calcul de la distance facturable
+        distance_facturable = distance_km * 2 if aller_retour else distance_km
+        cout_distance = distance_facturable * tarif_km
         total += cout_distance
 
         cout_attente = minutes_attente * self.prix_par_minute_attente
@@ -67,6 +69,7 @@ class CalculateurTarifsTaxi:
         return {
             "prix_base": round(self.prix_base, 2),
             "distance_km": distance_km,
+            "distance_facturable": round(distance_facturable, 2),
             "cout_distance": round(cout_distance, 2),
             "minutes_attente": minutes_attente,
             "cout_attente": round(cout_attente, 2),
@@ -95,6 +98,7 @@ class CourseReponse(BaseModel):
     """
     prix_base: float
     distance_km: float
+    distance_facturable: float
     cout_distance: float
     minutes_attente: float
     cout_attente: float
