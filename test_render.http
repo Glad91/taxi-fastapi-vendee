@@ -11,35 +11,21 @@
 GET {{baseUrl}}/verifier-sante
 Accept: application/json
 
-###
-
 ### 2. Deuxième test de santé (doit être rapide maintenant)
 GET {{baseUrl}}/verifier-sante
 Accept: application/json
-
-###
-
-### ===============================================
-### 📊 TESTS FONCTIONNELS COMPLETS
-### ===============================================
 
 ### 3. Récupération des tarifs officiels
 GET {{baseUrl}}/tarifs
 Accept: application/json
 
-###
-
 ### 4. Estimation rapide - Course courte jour aller-retour
 GET {{baseUrl}}/estimation-rapide?distance_km=5&aller_retour=true
 Accept: application/json
 
-###
-
 ### 5. Estimation rapide - Course longue nuit aller simple
 GET {{baseUrl}}/estimation-rapide?distance_km=25&aller_retour=false&minutes_attente=3
 Accept: application/json
-
-###
 
 ### 6. Calcul détaillé - Course standard jour
 POST {{baseUrl}}/calculer-tarif
@@ -52,8 +38,6 @@ Content-Type: application/json
   "date_heure_depart": "2025-09-24T14:30:00"
 }
 
-###
-
 ### 7. Calcul détaillé - Course nuit weekend (tarif élevé)
 POST {{baseUrl}}/calculer-tarif
 Content-Type: application/json
@@ -64,8 +48,6 @@ Content-Type: application/json
   "aller_retour": false,
   "date_heure_depart": "2025-09-28T23:15:00"
 }
-
-###
 
 ### 8. Test tarif minimum (course très courte)
 POST {{baseUrl}}/calculer-tarif
@@ -78,8 +60,6 @@ Content-Type: application/json
   "date_heure_depart": "2025-09-24T10:00:00"
 }
 
-###
-
 ### 9. Course dimanche après-midi (tarif majoré)
 POST {{baseUrl}}/calculer-tarif
 Content-Type: application/json
@@ -91,12 +71,6 @@ Content-Type: application/json
   "date_heure_depart": "2025-09-28T16:30:00"
 }
 
-###
-
-### ===============================================
-### 🧪 TESTS DE VALIDATION ET ERREURS
-### ===============================================
-
 ### 10. Test validation - Distance négative (erreur 400 attendue)
 POST {{baseUrl}}/calculer-tarif
 Content-Type: application/json
@@ -106,8 +80,6 @@ Content-Type: application/json
   "minutes_attente": 0,
   "aller_retour": false
 }
-
-###
 
 ### 11. Test validation - Minutes d'attente négatives (erreur attendue)
 POST {{baseUrl}}/calculer-tarif
@@ -119,23 +91,13 @@ Content-Type: application/json
   "aller_retour": true
 }
 
-###
-
 ### 12. Test endpoint inexistant (erreur 404 attendue)
 GET {{baseUrl}}/endpoint-inexistant
 Accept: application/json
 
-###
-
-### ===============================================
-### ⚡ TESTS DE PERFORMANCE
-### ===============================================
-
 ### 13. Test rapide estimation (mesurer le temps de réponse)
 GET {{baseUrl}}/estimation-rapide?distance_km=10&aller_retour=true
 Accept: application/json
-
-###
 
 ### 14. Test calcul complexe (mesurer le temps de réponse)
 POST {{baseUrl}}/calculer-tarif
@@ -148,29 +110,16 @@ Content-Type: application/json
   "date_heure_depart": "2025-09-28T02:30:00"
 }
 
-###
-
-### ===============================================
-### 🌐 TESTS CORS ET HEADERS
-### ===============================================
-
 ### 15. Test CORS avec Origin
 GET {{baseUrl}}/verifier-sante
 Accept: application/json
 Origin: https://mon-site-client.com
-
-###
 
 ### 16. Test avec User-Agent personnalisé
 GET {{baseUrl}}/tarifs
 Accept: application/json
 User-Agent: TaxiApp/1.0 (Test Client)
 
-###
-
-### ===============================================
-### 📱 SIMULATION D'USAGE RÉEL
-### ===============================================
 
 ### 17. Scénario réel 1: Client demande estimation puis calcul détaillé
 GET {{baseUrl}}/estimation-rapide?distance_km=8.5&aller_retour=false
