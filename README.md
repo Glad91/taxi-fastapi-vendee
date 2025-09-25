@@ -41,9 +41,17 @@ Une API REST moderne et complète pour calculer les tarifs de taxi en Vendée se
 - **Serveur**: Uvicorn 0.37.0
 - **Documentation**: Swagger UI automatique
 
-## 🚀 Installation
+## 🥰 Documentation
 
-### Prérequis
+- [Swagger](https://api.b-tech.ovh/docs)
+- [Redoc](https://api.b-tech.ovh/redoc)
+
+## 😎 Demo
+
+- [API Demo tarifs](https://api.b-tech.ovh/tarifs)
+
+
+## 🚀 Installation
 
 - Python 3.8 ou supérieur
 - pip (gestionnaire de packages Python)
