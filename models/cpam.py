@@ -21,6 +21,28 @@ class CourseCPAMRequete(BaseModel):
     departement: str = Field("85", description="Numéro du département")
 
 
+class DetailsCPAMReponse(BaseModel):
+    forfait_prise_charge: float = Field(..., description="Forfait de prise en charge (€)")
+    distance_km: float = Field(..., description="Distance totale en kilomètres")
+    nb_patients: int = Field(..., description="Nombre de patients transportés")
+    forfait_grande_ville: float = Field(..., description="Supplément grande ville (€)")
+    km_facturables: float = Field(..., description="Kilomètres facturables (après 4km gratuits)")
+    tarif_km: float = Field(..., description="Tarif par kilomètre (€/km)")
+    cout_kilometrique: float = Field(..., description="Coût total kilométrique (€)")
+    base_tarifaire: float = Field(..., description="Base tarifaire avant majorations (€)")
+    majoration_taux: float = Field(..., description="Taux de majoration appliqué (0.0 à 1.0)")
+    majoration_type: str = Field(..., description="Type de majoration appliquée")
+    majoration_montant: float = Field(..., description="Montant de la majoration (€)")
+    supplement_tpmr: float = Field(..., description="Supplément TPMR (€)")
+    supplement_drom: float = Field(..., description="Supplément DROM (€)")
+    peages: float = Field(..., description="Frais de péage (€)")
+    total_supplements: float = Field(..., description="Total des suppléments (€)")
+    abattement_partage_taux: float = Field(..., description="Taux d'abattement transport partagé (0.0 à 1.0)")
+    abattement_partage_montant: float = Field(..., description="Montant de l'abattement transport partagé (€)")
+    departement: str = Field(..., description="Département de facturation")
+    date_heure_transport: str = Field(..., description="Date et heure du transport (ISO 8601)")
+
+
 class CourseCPAMReponse(BaseModel):
-    total: float
-    details: dict
+    total: float = Field(..., description="Tarif total de la course (€)")
+    details: DetailsCPAMReponse = Field(..., description="Détail complet du calcul CPAM")
