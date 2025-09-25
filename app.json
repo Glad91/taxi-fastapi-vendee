@@ -1,0 +1,38 @@
+{
+  "name": "taxi-fastapi-vendee",
+  "description": "API FastAPI pour calculs de tarifs taxi Vendée 2025 + CPAM transport sanitaire",
+  "keywords": ["fastapi", "taxi", "cpam", "vendee", "tarifs"],
+  "website": "https://github.com/Glad91/taxi-fastapi-vendee",
+  "repository": "https://github.com/Glad91/taxi-fastapi-vendee",
+  "scripts": {
+    "dokku": {
+      "predeploy": "echo 'Déploiement sur Dokku en cours...'"
+    }
+  },
+  "env": {
+    "PORT": {
+      "description": "Port sur lequel l'application écoute",
+      "value": "8000"
+    },
+    "LOG_LEVEL": {
+      "description": "Niveau de logs (DEBUG, INFO, WARNING, ERROR)",
+      "value": "INFO"
+    },
+    "PRODUCTION": {
+      "description": "Mode production (true/false)",
+      "value": "true"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}

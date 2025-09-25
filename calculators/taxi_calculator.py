@@ -1,5 +1,6 @@
 from datetime import datetime, time, date
 from typing import Optional
+from functools import lru_cache
 import pytz
 
 
@@ -35,28 +36,22 @@ class CalculateurTarifsTaxi:
         """Retourne l'heure actuelle en France avec gestion automatique été/hiver"""
         return datetime.now(self.fuseau_france)
 
-    def calculer_tarif_course(self, distance_km: float, minutes_attente: float = 0, date_heure_depart: Optional[datetime] = None, aller_retour: bool = False):
-        """Calcule le tarif total de la course"""
-        if date_heure_depart is None:
-            date_heure_depart = self.obtenir_heure_france()
-        # Si une heure est fournie sans timezone, on assume qu'elle est en heure française
-        elif date_heure_depart.tzinfo is None:
-            date_heure_depart = self.fuseau_france.localize(date_heure_depart)
-
+    @lru_cache(maxsize=1000)
+    def _calculer_tarif_core(self, distance_km: float, minutes_attente: float, est_nuit_ou_dimanche: bool, aller_retour: bool):
+        """Version cachée du calcul de base (sans date pour le cache)"""
         total = self.prix_base
-        est_nuit_ou_dimanche = self.est_dimanche(date_heure_depart.date()) or self.est_tarif_nuit(date_heure_depart.time())
 
         if aller_retour:
             if est_nuit_ou_dimanche:
                 tarif_km = self.tarif_b_nuit
-                type_tarif = "dimanche/ferie aller-retour (tarif B)" if self.est_dimanche(date_heure_depart.date()) else "nuit aller-retour (tarif B)"
+                type_tarif = "nuit aller-retour (tarif B)"
             else:
                 tarif_km = self.tarif_a_jour
                 type_tarif = "jour aller-retour (tarif A)"
         else:
             if est_nuit_ou_dimanche:
                 tarif_km = self.tarif_d_nuit
-                type_tarif = "dimanche/ferie aller simple (tarif D)" if self.est_dimanche(date_heure_depart.date()) else "nuit aller simple (tarif D)"
+                type_tarif = "nuit aller simple (tarif D)"
             else:
                 tarif_km = self.tarif_c_jour
                 type_tarif = "jour aller simple (tarif C)"
@@ -69,21 +64,48 @@ class CalculateurTarifsTaxi:
         cout_attente = minutes_attente * self.prix_par_minute_attente
         total += cout_attente
 
-        total_avant_minimum = total
-        if total < self.tarif_minimum:
+        tarif_minimum_applique = total < self.tarif_minimum
+        if tarif_minimum_applique:
             total = self.tarif_minimum
 
         return {
             "prix_base": round(self.prix_base, 2),
-            "distance_km": distance_km,
             "distance_facturable": round(distance_facturable, 2),
             "cout_distance": round(cout_distance, 2),
-            "minutes_attente": minutes_attente,
             "cout_attente": round(cout_attente, 2),
             "type_tarif": type_tarif,
-            "aller_retour": aller_retour,
             "tarif_km": round(tarif_km, 2),
-            "tarif_minimum_applique": total == self.tarif_minimum,
-            "total": round(total, 2),
+            "tarif_minimum_applique": tarif_minimum_applique,
+            "total": round(total, 2)
+        }
+
+    def calculer_tarif_course(self, distance_km: float, minutes_attente: float = 0, date_heure_depart: Optional[datetime] = None, aller_retour: bool = False):
+        """Calcule le tarif total de la course (utilise le cache pour les calculs répétitifs)"""
+        if date_heure_depart is None:
+            date_heure_depart = self.obtenir_heure_france()
+        # Si une heure est fournie sans timezone, on assume qu'elle est en heure française
+        elif date_heure_depart.tzinfo is None:
+            date_heure_depart = self.fuseau_france.localize(date_heure_depart)
+
+        est_nuit_ou_dimanche = self.est_dimanche(date_heure_depart.date()) or self.est_tarif_nuit(date_heure_depart.time())
+
+        # Utilise le cache pour le calcul de base
+        resultat_cache = self._calculer_tarif_core(distance_km, minutes_attente, est_nuit_ou_dimanche, aller_retour)
+
+        # Ajout des informations non-cachables (date, type de tarif détaillé)
+        if est_nuit_ou_dimanche:
+            if aller_retour:
+                type_tarif = "dimanche/ferie aller-retour (tarif B)" if self.est_dimanche(date_heure_depart.date()) else "nuit aller-retour (tarif B)"
+            else:
+                type_tarif = "dimanche/ferie aller simple (tarif D)" if self.est_dimanche(date_heure_depart.date()) else "nuit aller simple (tarif D)"
+        else:
+            type_tarif = resultat_cache["type_tarif"]
+
+        return {
+            **resultat_cache,
+            "distance_km": distance_km,
+            "minutes_attente": minutes_attente,
+            "type_tarif": type_tarif,
+            "aller_retour": aller_retour,
             "date_heure_depart": date_heure_depart.isoformat()
         }
