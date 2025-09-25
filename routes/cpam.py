@@ -17,6 +17,7 @@ async def calculer_tarif_cpam(requete: CourseCPAMRequete):
         distance_km=requete.distance_km,
         ville_depart=requete.ville_depart,
         ville_arrivee=requete.ville_arrivee,
+        tarif_nuit=requete.tarif_nuit,
         date_heure_transport=requete.date_heure_transport,
         type_transport=requete.type_transport,
         nb_patients=requete.nb_patients,

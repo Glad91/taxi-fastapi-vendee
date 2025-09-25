@@ -49,6 +49,7 @@ class CalculateurTarifsCPAM:
                            distance_km: float,
                            ville_depart: str = "",
                            ville_arrivee: str = "",
+                           tarif_nuit: bool = False,
                            date_heure_transport: Optional[datetime] = None,
                            type_transport: TypeTransport = TypeTransport.SIMPLE,
                            nb_patients: int = 1,
@@ -83,10 +84,14 @@ class CalculateurTarifsCPAM:
         majoration_appliquee = 0.0
         type_majoration = ""
 
-        if (self.est_tarif_nuit(date_heure_transport.time()) or
-            CalculateurTarifsCPAM.est_weekend_ou_ferie(date_heure_transport.date())):
+        # Priorité au paramètre tarif_nuit, sinon calcul automatique si date fournie
+        if tarif_nuit:
             majoration_appliquee = self.majoration_nuit_weekend
             type_majoration = "nuit/weekend"
+        elif date_heure_transport and (self.est_tarif_nuit(date_heure_transport.time()) or
+              CalculateurTarifsCPAM.est_weekend_ou_ferie(date_heure_transport.date())):
+            majoration_appliquee = self.majoration_nuit_weekend
+            type_majoration = "nuit/weekend (calculé)"
 
         if type_transport == TypeTransport.HOSPITALISATION:
             if distance_km < 50:
