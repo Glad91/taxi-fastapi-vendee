@@ -12,7 +12,9 @@
       "Bash(python:*)",
       "Bash(tree:*)",
       "Bash(grep:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ssh dokku@b-tech.ovh apps:unlock:*)",
+      "Bash(ssh dokku@b-tech.ovh config:set taxi-api PORT=80)"
     ],
     "deny": [],
     "ask": []

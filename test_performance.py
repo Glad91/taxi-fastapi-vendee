@@ -4,7 +4,7 @@ import statistics
 from concurrent.futures import ThreadPoolExecutor
 
 # Test de performance pour l'API optimisée
-API_BASE = "http://127.0.0.1:8000"
+API_BASE = "https://api.b-tech.ovh:8000"
 
 def test_taxi_endpoint():
     """Test l'endpoint taxi"""
