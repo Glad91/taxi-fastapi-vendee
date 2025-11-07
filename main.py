@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
-from routes import health, taxi, cpam
+from routes import health, taxi, cpam, images
 
 # --- Initialisation de l'API ---
 
@@ -20,6 +20,7 @@ app.add_middleware(GZipMiddleware, minimum_size=500)
 app.include_router(health.router, tags=["Santé"])
 app.include_router(taxi.router, tags=["Taxi Vendée"])
 app.include_router(cpam.router, tags=["CPAM Transport Sanitaire"])
+app.include_router(images.router, tags=["Compression d'images"])
 
 
 # Pour lancer l'application en ligne de commande :
