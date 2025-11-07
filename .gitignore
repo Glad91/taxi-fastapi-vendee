@@ -176,3 +176,12 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# MCP configuration (contains API keys)
+.mcp.json
+
+# Local environment overrides
+.env.example
